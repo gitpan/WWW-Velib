@@ -1,0 +1,50 @@
+use strict;
+use warnings;
+
+use Getopt::Std;
+
+use lib 'blib/lib';
+use WWW::Velib;
+
+getopts( 'a:c:el:m:p:', \my %opt );
+
+my ($login, $pin, $cache);
+
+if ($opt{e}) {
+    $login = $ENV{VELIB_LOGIN};
+    $pin   = $ENV{VELIB_PIN};
+}
+exists $opt{l} and $login = $opt{l};
+exists $opt{p} and $pin   = $opt{p};
+
+my %arg;
+
+if (defined $login and defined $pin) {
+    $arg{login} = $login;
+    $arg{pin}   = $pin;
+}
+else {
+    $arg{defer} = 1;
+}
+
+exists $opt{a} and $arg{myaccount} = $opt{a};
+exists $opt{c} and $arg{cache_dir} = $opt{c};
+exists $opt{a} and $arg{myaccount} = $opt{a};
+exists $opt{m} and $arg{month}     = $opt{m};
+
+my $v = WWW::Velib->new(%arg);
+$v->get_month unless $arg{defer};
+
+print
+    'end_date    = ', $v->end_date, "\n",
+    'remain      = ', $v->remain, "\n",
+    'conso_month = ', $v->conso_month, "\n",
+    'conso_year  = ', $v->conso_year, "\n",
+    'conso_trips = ', $v->conso_trips, "\n",
+    'conso_time  = ', $v->conso_time, "\n",
+    'conso_bal   = ', $v->conso_bal, "\n",
+;
+
+for my $trip ($v->trips) {
+    print "from $trip->{from} to $trip->{to}\n";
+}
