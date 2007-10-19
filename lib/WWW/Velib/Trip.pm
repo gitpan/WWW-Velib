@@ -7,7 +7,7 @@ package WWW::Velib::Trip;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 sub make {
     my $class = shift;
@@ -21,6 +21,12 @@ sub make {
     return bless $self, $class;
 }
 
+sub date     { $_[0]->{date} }
+sub from     { $_[0]->{from} }
+sub to       { $_[0]->{to} }
+sub duration { $_[0]->{duration} }
+sub cost     { $_[0]->{cost} }
+
 'The Lusty Decadent Delights of Imperial Pompeii';
 __END__
 
@@ -30,7 +36,7 @@ WWW::Velib::Trip - Details of a single trip made on the Velib system
 
 =head1 VERSION
 
-This document describes version 0.01 of WWW::Velib, released
+This document describes version 0.02 of WWW::Velib::Trip, released
 2007-xx-xx.
 
 =head1 SYNOPSIS
@@ -50,11 +56,17 @@ This document describes version 0.01 of WWW::Velib, released
 
 =over 8
 
+=item make
+
 =item from
 
 =item to
 
+=item date
+
 =item duration
+
+=item cost
 
 =back
 

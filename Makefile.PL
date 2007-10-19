@@ -15,7 +15,10 @@ WriteMakefile(
     AUTHOR        => 'David Landgren',
     LICENSE       => 'perl',
     PREREQ_PM => {
+        'Crypt::SSLeay'  => '0.53',
+        'LWP::Simple'    => 0,
+        'Math::Trig'     => 0,
         'WWW::Mechanize' => 0,
-		'Crypt::SSLeay'  => '0.53',
+        'XML::Twig'      => 0,
     },
 );

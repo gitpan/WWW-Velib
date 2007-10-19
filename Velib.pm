@@ -7,7 +7,7 @@ package WWW::Velib;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 use WWW::Mechanize;
 use WWW::Velib::Trip;
@@ -181,15 +181,17 @@ sub _myaccount_parse {
 \s*<div class="info_compte">
 \s*<p><span>Votre compte prend fin le :</span> ([^<]+)</p>
 \s*<p><span>Il vous reste encore (\d+) jours d'abonnement</span></p>
-\s*<p><span>\s+Vous n'avez pas de v√©lo en cours de location\.};
+\s*<p><span>\s+Vous (n'avez pas de|avez un) v√©lo en cours de location\.};
 
     if ($html =~ /$abo_re/) {
         $self->{end_date} = $1;
         $self->{remain}   = $2;
+        $self->{in_use}   = ($3 eq 'avez un') ? 1 : 0;
     }
     else {
         $self->{end_date} = '';
         $self->{remain}   = 0;
+        $self->{in_use}   = 0;
     }
 
     my $solde_re = qr{<h3 class="titre_top titre_top_compte">
@@ -242,6 +244,11 @@ sub remain {
     return $self->{remain};
 }
 
+sub in_use {
+    my $self = shift;
+    return $self->{in_use};
+}
+
 sub balance {
     my $self = shift;
     return $self->{balance};
@@ -286,8 +293,8 @@ WWW::Velib - Download account information from the Velib website
 
 =head1 VERSION
 
-This document describes version 0.01 of WWW::Velib, released
-2007-10-02.
+This document describes version 0.02 of WWW::Velib, released
+2007-xx-xx.
 
 =head1 SYNOPSIS
 
@@ -394,7 +401,12 @@ Retrieves the details of the trips made during the current month.
 
 =item balance
 
-Returns the current balance of your account (in Euros).
+Returns the current balance of your account (in Euros). If you have
+taken a bike for more than half an hour, this amount will be negative.
+In that case, you will not be able to take another one until you have
+brought the balance up to at least zero. If you have credited your
+account with a few euros to make allowances for the occasional long
+ride, the balance will be positive.
 
 =item end_date
 
@@ -403,6 +415,11 @@ Returns the date your Velib subscription expires.
 =item remain
 
 Returns the number of days left until the end of the Velib subscription.
+
+=item in_use
+
+Returns a true value if the Velib' system considers that you have taken
+out a bike and not returned it. This could be costly...
 
 =item conso_month
 
@@ -424,8 +441,8 @@ Returns the total amount of time (in minutes) taken this month.
 
 =item conso_bal
 
-Returns the current balance of your account (should be the same as
-C<balance>).
+Returns the cost of the bicycle trips made this month. If all trips
+have taken less than 30 minutes, it will be zero. See also C<balance>).
 
 =item trips
 
@@ -477,6 +494,8 @@ C<WWW::Mechanizer> - The only game in town for navigating web sites in Perl.
 L<http://www.velib.paris.fr> - The official Paris VÈlib' website.
 
 L<https://abofr-velib.cyclocity.fr/> - The actual accounts website.
+
+L<http://velib.shiva.easynet.fr/> - RRDtool statistics for all the VÈlib' stations
 
 =back
 

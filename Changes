@@ -1,5 +1,11 @@
 Revision history for Perl extension WWW::Velib
 
+0.02
+    - implement WWW::Velib::Station to retrieve the status of a
+      station (slots free, used, broken).
+    - implement WWW::Velib::Map to retrieve geographical information
+      about the stations in the Velib' system.
+
 0.01 2007-09-22 15:04:43 UTC
     - initial version.
 
