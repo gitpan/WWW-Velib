@@ -11,7 +11,7 @@ use XML::Twig;
 use WWW::Velib::Station;
 
 use vars '$VERSION';
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 use constant DETAILS => 'http://www.velib.paris.fr/service/carto';
 
@@ -140,7 +140,7 @@ __END__
 
 =head1 NAME
 
-WWW::Velib::Map
+WWW::Velib::Map Process the Velib' map information
 
 =head1 VERSION
 
@@ -159,11 +159,56 @@ This document describes version 0.01 of WWW::Velib::Map, released
 
 =item new
 
+Download a the Velib' map information from the web. The information
+may be cached locally (see the C<save> method). A previously saved
+map file may be loaded by specifying it with the C<file> attribute.
+
+  my $map = WWW::Velib::Map->new; # download from the web
+
+  my $m2  = WWW::Velib::Map->new(file => 'map.data'); # use local file
+
+In the latter example, the method will croak if the file does not
+exist or cannot be decoded.
+
 =item save
+
+Save the downloaded map information into a local file. The method
+will croak if the file cannot be written.
+
+  $map->save('map.data');
 
 =item search
 
+Search the station list for the stations that match some criteria.
+Returns an array of C<WWW::Velib::Station> objects.
+
+Currently, one may search for stations near a given station, limited
+by either number or distance (in metres). The stations may be queried
+for current details (availabale bikes and slots).
+
+Search by distance (returns all the stations within n metres):
+
+  my @station = $m->search( station => 1234, distance => 600 );
+
+To obtain the status of each station, use the C<status> attribute:
+
+  my @station = $m->search(
+	station  => 2345,
+	distance => 500,
+	status   => 1,
+  );
+
+Search by number (returns the n closest stations):
+
+  my @station = $m->search( station => 1234, n => 4 );
+
+I<Nota bene>: the official map contains many errors. Alternate maps
+of better quality exist and will be used in a future version.
+
 =item station
+
+Returns a reference to a hash of all the stations in the map,
+keyed by station number.
 
 =back
 

@@ -7,7 +7,7 @@ package WWW::Velib;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 use WWW::Mechanize;
 use WWW::Velib::Trip;
@@ -293,8 +293,8 @@ WWW::Velib - Download account information from the Velib website
 
 =head1 VERSION
 
-This document describes version 0.02 of WWW::Velib, released
-2007-xx-xx.
+This document describes version 0.03 of WWW::Velib, released
+2007-10-20.
 
 =head1 SYNOPSIS
 
