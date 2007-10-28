@@ -96,7 +96,7 @@ __END__
 
 =head1 NAME
 
-WWW::Velib::Station - Check the availability of bokes at a Velib' station
+WWW::Velib::Station - Details of Velib' station bicycle and parking availability
 
 =head1 VERSION
 

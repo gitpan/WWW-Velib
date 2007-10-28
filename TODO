@@ -8,3 +8,13 @@ Download last 2 days/1, 2 or 3 weeks details.
 Download account information (name, date, CP, etc)
 
 Decide on myaccount/get_myaccount, and multiple months.
+
+Remove eg/station (merge into eg/velib)
+
+Search for open/not open stations
+
+Reduce size of eg/data/*
+
+Diff two maps
+
+Search stations by like_name, like_address

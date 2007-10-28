@@ -7,7 +7,7 @@ package WWW::Velib;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use WWW::Mechanize;
 use WWW::Velib::Trip;
@@ -149,7 +149,7 @@ sub get_month {
     return unless defined $month_detail;
 
     my $detail_re = qr{\s*<tr class="[^"]*">
-\s*<td>&nbsp;(\d\d/\d\d/\d\d\d\d)</td>
+\s*<td>&nbsp;(\d{2}/\d{2}/\d{4})</td>
 \s*<td>(.*?) -> ([^<]+)</td>
 \s*<td>(\d+)h (\d+)min</td>
 \s*<td>(\d+,\d+) &euro;</td>
@@ -157,8 +157,9 @@ sub get_month {
 
     if (my @match = $month_detail =~ /$detail_re/g) {
         while (@match) {
-            push @{$self->{trip}},
-                WWW::Velib::Trip->make(splice(@match, 0, 6));
+            my @trip = splice(@match, 0, 6);
+            (my $datestamp = $trip[0]) =~ s{^(\d{2})/(\d{2})/(\d{4})$}{$3$2$1};
+            unshift @{$self->{trip}{$datestamp}}, WWW::Velib::Trip->make(@trip);
         }
     }
 }
@@ -281,7 +282,38 @@ sub conso_bal {
 
 sub trips {
     my $self = shift;
-    return $self->{trip} ? @{$self->{trip}} : ();
+    return () unless  $self->{trip};
+    my @trip;
+    push @trip, @{$self->{trip}{$_}} for sort keys %{$self->{trip}};
+    return @trip;
+}
+
+sub next_trip {
+    my $self = shift;
+    return unless $self->{trip};
+
+    if (not (exists $self->{trip_day} and exists $self->{trip_day_n})) {
+        $self->reset_trip;
+        return $self->{trip}{$self->{trip_day}[0]}[$self->{trip_day_n}];
+    }
+
+    if (++$self->{trip_day_n} <=  $#{$self->{trip}{$self->{trip_day}[0]}}) {
+        return $self->{trip}{$self->{trip_day}[0]}[$self->{trip_day_n}];
+    }
+
+    shift @{$self->{trip_day}};
+    return unless scalar @{$self->{trip_day}};
+    $self->{trip_day_n} = 0;
+
+    return $self->{trip}{$self->{trip_day}[0]}[$self->{trip_day_n}];
+}
+
+sub reset_trip {
+    my $self = shift;
+    return unless $self->{trip};
+
+    $self->{trip_day} = [sort keys %{$self->{trip}}];
+    $self->{trip_day_n} = 0;
 }
 
 'The Lusty Decadent Delights of Imperial Pompeii';
@@ -293,8 +325,8 @@ WWW::Velib - Download account information from the Velib website
 
 =head1 VERSION
 
-This document describes version 0.03 of WWW::Velib, released
-2007-10-20.
+This document describes version 0.04 of WWW::Velib, released
+2007-10-28.
 
 =head1 SYNOPSIS
 
@@ -449,8 +481,22 @@ have taken less than 30 minutes, it will be zero. See also C<balance>).
 Returns an array containing the details of all the trip made in the
 current month. Each element of the array is a C<WWW::Velib::Trip>
 object: consult that page for information on how to process them.
-The array is ordered in the same order as the trip details are
-listed on the web page.
+The array is ordered by date, from oldest to newest.
+
+=item next_trip
+
+Acts as an iterator over the list of trips. Returns the first and
+subsequent trips on each call. Returns C<undef> after the last trip
+has been returned.
+
+  while (my $trip = $v->next_trip) {
+      print $trip->date, ' from ', $trip->from, ' to ', $trip->to, $/;
+  }
+
+=item reset_trip
+
+Resets the trip iterator. The next call to C<next_trip> will return
+the first trip.
 
 =back
 
@@ -489,13 +535,19 @@ module that made the heavy lifting a snap to write.
 
 =over 4
 
-C<WWW::Mechanizer> - The only game in town for navigating web sites in Perl.
+C<WWW::Mechanizer> - The only game in town for navigating web sites
+in Perl.
 
-L<http://www.velib.paris.fr> - The official Paris Vélib' website.
+L<http://www.velib.paris.fr/> - The official Paris Vélib' website.
 
 L<https://abofr-velib.cyclocity.fr/> - The actual accounts website.
 
-L<http://velib.shiva.easynet.fr/> - RRDtool statistics for all the Vélib' stations
+L<http://velib.shiva.easynet.fr/> - RRDtool statistics for all the
+Vélib' stations
+
+L<http://www.abaababa.info/hamsterfute/> - Animated graphics:
+distance from the nearest station/station with bikes/station with
+slots over the past day.
 
 =back
 
@@ -507,7 +559,7 @@ http://www.landgren.net/perl/
 
 If you (find a) use this module, I'd love to hear about it. If you
 want to be informed of updates, send me a note. You know my first
-name, you know my domain. Can you guess my e-mail address?
+name, you know my domain. Can you figure out my e-mail address?
 
 =head1 LICENSE
 

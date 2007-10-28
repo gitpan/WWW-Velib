@@ -13,35 +13,49 @@ if (!$ENV{PERL_AUTHOR_TESTING}) {
     exit;
 }
 
-eval qq{use Test::Pod};
-my $has_test_pod = $@ ? 0 : 4;
-
-eval qq{use Test::Pod::Coverage};
-my $has_test_pod_coverage = $@ ? 0 : 4;
-
-my $test_modules = $has_test_pod + $has_test_pod_coverage;
-
-if ($test_modules > 1) {
-    plan tests => $test_modules;
+my @file = qw(
+    eg/velib
+    eg/velistat
+);
+if (open my $MAN, '<', 'MANIFEST') {
+    while (<$MAN>) {
+        chomp;
+        push @file, $_ if /\.pm$/;
+    }
+    close $MAN;
 }
 else {
-    plan skip_all => 'POD and Kwalitee testing modules not installed';
+    diag "failed to read MANIFEST: $!";
+}
+
+my @coverage = qw(
+    WWW::Velib
+    WWW::Velib::Map
+    WWW::Velib::Station
+    WWW::Velib::Trip
+);
+
+my $test_pod_tests = eval "use Test::Pod"
+    ? 0 : @file;
+
+my $test_pod_coverage_tests = eval "use Test::Pod::Coverage"
+    ? 0 : @coverage;
+
+if ($test_pod_tests + $test_pod_coverage_tests) {
+    plan tests => @file + @coverage;
+}
+else {
+    plan skip_all => 'POD testing modules not installed';
 }
 
 SKIP: {
-    skip( 'Test::Pod not installed on this system', 4 )
-        unless $has_test_pod;
-    pod_file_ok( 'Velib.pm' );
-    pod_file_ok( 'lib/WWW/Velib/Map.pm' );
-    pod_file_ok( 'lib/WWW/Velib/Station.pm' );
-    pod_file_ok( 'lib/WWW/Velib/Trip.pm' );
+    skip( 'Test::Pod not installed on this system', scalar(@file) )
+        unless $test_pod_tests;
+    pod_file_ok($_) for @file;
 }
 
 SKIP: {
-    skip( 'Test::Pod::Coverage not installed on this system', 4 )
-        unless $has_test_pod_coverage;
-    pod_coverage_ok( 'WWW::Velib', 'POD coverage is go!' );
-    pod_coverage_ok( 'WWW::Velib::Map', 'Map POD coverage is go!' );
-    pod_coverage_ok( 'WWW::Velib::Station', 'Station POD coverage is go!' );
-    pod_coverage_ok( 'WWW::Velib::Trip', 'Trip POD coverage is go!' );
+    skip( 'Test::Pod::Coverage not installed on this system', scalar(@coverage) )
+        unless $test_pod_coverage_tests;
+    pod_coverage_ok( $_, "$_ POD coverage is go!" ) for @coverage;
 }

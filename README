@@ -1,4 +1,4 @@
-The file is the README for WWw::Velib version 0.03
+The file is the README for WWw::Velib version 0.04
 
 INSTALLATION
 
@@ -35,7 +35,8 @@ out the canonical path of the file:
   perl -MWWW::Velib -le 'print $INC{"WWW/Velib.pm"}'
 
 Just delete this file. There is also the question of the man page.
-Finding that is left as an exercise to the reader.
+Finding that is left as an exercise to the reader, as is the
+removal of WWW::Velib::{Map,Station,Trip}.
 
 USAGE
 

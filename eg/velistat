@@ -14,31 +14,31 @@ getopts('d:f:n:sv', \my %opt);
 $opt{v} and do {print "$0 v$VERSION\n" and exit};
 
 my %init;
-$opt{f} and $init{file} = $init{f};
+$opt{f} and $init{file} = $opt{f};
 my $m = WWW::Velib::Map->new(%init);
 
 my $origin = shift; # 2017 3011
 
 (!$opt{d} and !$opt{n}) and $opt{n} = 8;
+my $status = $opt{s} ? 0 : 1;
+
 my @station;
 if ($opt{n}) {
-    @station = $m->search( station => $origin, status => 1, n => $opt{n});
+    @station = $m->search( station => $origin, status => $status, n => $opt{n});
 }
 elsif ($opt{d}) {
-    @station = $m->search( station => $origin, status => 1, distance => $opt{d});
+    @station = $m->search( station => $origin, status => $status, distance => $opt{d});
 }
 
 for my $s (@station) {
-    my $free      = '_' x $s->free;
-    my $available = '%' x $s->available;
-    my $disabled  = 'x' x $s->disabled;
-
-    print <<END_STATION
-station $s->{number} ($s->{dist}m)
-    $s->{fullAddress}
-    $available$free$disabled
-
-END_STATION
+    print "station $s->{number} ($s->{dist}m)\n    $s->{fullAddress}\n";
+    if ($status) {
+        my $free      = '_' x $s->free;
+        my $available = '%' x $s->available;
+        my $disabled  = 'x' x $s->disabled;
+        print "    $available$free$disabled\n";
+    }
+    print "\n";
 }
 
 $m->save("velib-map-" . time . ".txt");
@@ -113,6 +113,8 @@ defaults to 1).
 =item B<-s>
 
 Download the status of each station (available bikes, available slots).
+
+=back
 
 =head1 SEE ALSO
 

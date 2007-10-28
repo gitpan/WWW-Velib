@@ -33,8 +33,21 @@ else {
 exists $opt{a} and $arg{myaccount} = $opt{a};
 exists $opt{c} and $arg{cache_dir} = $opt{c};
 
-exists $opt{a} and $arg{myaccount} = ($opt{c} ? "$opt{c}/" : '') . $opt{a};
-exists $opt{m} and $arg{month}     = ($opt{c} ? "$opt{c}/" : '') . $opt{m};
+if ($opt{a}) {
+    $arg{myaccount} = $opt{a};
+    if (!-f $opt{a} and $opt{c}) {
+        my $file = "$opt{c}/$opt{a}";
+        $arg{myaccount} = $file if -f $file;
+    }
+}
+
+if ($opt{m}) {
+    $arg{month} = $opt{m};
+    if (!-f $opt{m} and $opt{c}) {
+        my $file = "$opt{c}/$opt{m}";
+        $arg{month} = $file if -f $file;
+    }
+}
 
 if ($opt{L} and $arg{cache_dir}) {
     my $dir = $arg{cache_dir};
@@ -71,7 +84,7 @@ if ($opt{b}) {
     exit;
 }
 
-print
+defined $v->end_date and print
     'end_date    = ', $v->end_date, "\n",
     'remain      = ', $v->remain, "\n",
     'in use      = ', $v->in_use, "\n",
@@ -82,6 +95,44 @@ print
     'conso_time  = ', $v->conso_time, "\n",
 ;
 
-for my $trip ($v->trips) {
+while (my $trip = $v->next_trip) {
     print "$trip->{date} $trip->{duration}m from $trip->{from} to $trip->{to}\n";
 }
+
+__END__
+
+=head1 NAME
+
+velib - Velib' web information
+
+=head1 SYNOPSIS
+
+B<velib>
+
+=head1 DESCRIPTION
+
+=head1 EXAMPLE
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-f> file
+
+Use a cached map file instead of downloading a map.
+
+=back
+
+=head1 SEE ALSO
+
+L<WWW::Velib>
+
+=head1 AUTHOR
+
+Copyright (C) 2007 David Landgren. All rights reserved.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

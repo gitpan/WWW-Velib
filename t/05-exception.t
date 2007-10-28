@@ -20,6 +20,6 @@ use WWW::Velib::Map;
 dies_ok( sub{WWW::Velib::Map->new(file => '/no/such/file')}, 'no such file' );
 dies_ok( sub{WWW::Velib::Map->new(file => 'MANIFEST')},      'garbage file' );
 
-my $m = WWW::Velib::Map->new(file => 'eg/map.cache.v1');
+my $m = WWW::Velib::Map->new(file => 'eg/data/map.cache.v1');
 dies_ok( sub{$m->save}, 'save no file' );
 dies_ok( sub{$m->save('/path/to/nothing/at/all')}, 'save failure' );

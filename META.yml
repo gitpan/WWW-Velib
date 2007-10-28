@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                WWW-Velib
-version:             0.03
+version:             0.04
 abstract:            Download account information from the Velib website
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.36
