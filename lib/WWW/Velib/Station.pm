@@ -101,7 +101,7 @@ WWW::Velib::Station - Details of Velib' station bicycle and parking availability
 =head1 VERSION
 
 This document describes version 0.01 of WWW::Velib::Station, released
-2007-xx-xx.
+2007-11-13.
 
 =head1 SYNOPSIS
 

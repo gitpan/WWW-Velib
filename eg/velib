@@ -6,7 +6,6 @@ $VERSION = '0.02';
 
 use Getopt::Std;
 
-use lib 'blib/lib';
 use WWW::Velib;
 
 getopts( 'a:c:eLl:m:p:', \my %opt );

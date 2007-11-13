@@ -14,8 +14,6 @@ $_ = $Unchanged;
 eval q{ use_ok 'WWW::Velib::Station' };
 eval q{ use_ok 'WWW::Velib::Map' };
 
-diag( "testing WWW::Velib::Station v$WWW::Velib::Station::VERSION" );
-
 my $s = WWW::Velib::Station->new(2007);
 ok( defined($s), 'new() defines ...' );
 is( ref($s), 'WWW::Velib::Station', '... a WWW::Velib::Station object' );

@@ -7,12 +7,12 @@ package WWW::Velib;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use WWW::Mechanize;
 use WWW::Velib::Trip;
 
-use constant HOST      => 'https://abofr-velib.cyclocity.fr/';
+use constant HOST      => 'https://abo-paris.cyclocity.fr/';
 use constant LOGIN_URL => HOST . 'service/login';
 use constant ACCT_URL  => HOST . 'service/myaccount';
 use constant MONTH_URL => HOST . 'service/myaccount/month';
@@ -98,7 +98,7 @@ sub _connect {
     my $self = shift;
     my $m = $self->{mech};
 
-    $m->get('https://abofr-velib.cyclocity.fr/service/login');
+    $m->get(HOST . '/service/login');
     $self->{html}{initial} = $m->content;
     $self->{connected}     = 1;
 
@@ -107,7 +107,7 @@ sub _connect {
     $m->current_form->value('Password', $self->{pin});
     $m->click('LoginButton');
 
-    $m->get('https://abofr-velib.cyclocity.fr/service/myaccount');
+    $m->get(HOST . '/service/myaccount');
     $self->{html}{myaccount} = $m->content;
     if ($self->{cache_dir} and -d $self->{cache_dir}) {
         _out($self->{html}{myaccount}, $self->{cache_dir}, 'myaccount');
@@ -175,34 +175,39 @@ sub _myaccount_parse {
     my $self = shift;
     my $html = $self->{html}{myaccount};
 
-    my $abo_re = qr{<h2 class="pad_bot2">Mon compte</h2>
-<div class="border_vert">\s*<div class="content">
-\s*<h3 class="titre_top titre_top_compte">Mon abonnement</h3>
+    my $solde_re = qr{<h3 class="titre_top titre_top_compte">
+\s*Mon paiement en ligne</h3>
 \s*<div class="breaker"></div>
 \s*<div class="info_compte">
+\s*<p><span>Solde :</span>(\S+) &euro;</p>};
+    if ($html =~ /$solde_re/) {
+        $self->{balance} = $1;
+        $self->{balance} =~ tr/,/./;
+    }
+
+    my $abo_re = qr{<div class="border_vert">
+\s*<div class="content">
+\s*<h3 class="titre_top titre_top_compte">Mon abonnement</h3>
+\s*<div class="breaker"></div>
+\s*<div class="info_compte">(?:\s*<p><span>Solde :</span>(\S+) &euro;</p>)?
 \s*<p><span>Votre compte prend fin le :</span> ([^<]+)</p>
 \s*<p><span>Il vous reste encore (\d+) jours d'abonnement</span></p>
 \s*<p><span>\s+Vous (n'avez pas de|avez un) vÃ©lo en cours de location\.};
 
     if ($html =~ /$abo_re/) {
-        $self->{end_date} = $1;
-        $self->{remain}   = $2;
-        $self->{in_use}   = ($3 eq 'avez un') ? 1 : 0;
+        if (!$self->{balance} and defined $1) {
+            $self->{balance} = $1;
+            $self->{balance} =~ tr/,/./;
+        }
+        $self->{end_date} = $2;
+        $self->{remain}   = $3;
+        $self->{in_use}   = ($4 eq 'avez un') ? 1 : 0;
     }
     else {
         $self->{end_date} = '';
         $self->{remain}   = 0;
         $self->{in_use}   = 0;
     }
-
-    my $solde_re = qr{<h3 class="titre_top titre_top_compte">
-\s*Mon paiement en ligne</h3>
-\s*<div class="breaker"></div>
-\s*<div class="info_compte">
-\s*<p><span>Solde :</span>(\S+) &euro;</p>};
-
-    $self->{balance} = ($html =~ /$solde_re/) ? $1 : 0;
-    $self->{balance} =~ tr/,/./;
 
     my $conso_re = qr{<h3 class="titre_top titre_top_compte2">Ma consommation en (\S+) (\d+)</h3>
 \s*<div class="breaker"></div>
@@ -325,8 +330,8 @@ WWW::Velib - Download account information from the Velib website
 
 =head1 VERSION
 
-This document describes version 0.04 of WWW::Velib, released
-2007-10-28.
+This document describes version 0.05 of WWW::Velib, released
+2007-11-13.
 
 =head1 SYNOPSIS
 
@@ -540,7 +545,8 @@ in Perl.
 
 L<http://www.velib.paris.fr/> - The official Paris Vélib' website.
 
-L<https://abofr-velib.cyclocity.fr/> - The actual accounts website.
+L<https://abo-paris.cyclocity.fr/> - The actual accounts website. (Formerly
+abofr-velib.cyclocity.fr).
 
 L<http://velib.shiva.easynet.fr/> - RRDtool statistics for all the
 Vélib' stations

@@ -1,5 +1,9 @@
 Revision history for Perl extension WWW::Velib
 
+0.05 2007-11-13 14:35:39 UTC
+    - deal with hostname change and HTML changes
+    - more methods documented in sub-packages
+
 0.04 2007-10-28 17:24:57 UTC
     - Month trips: return date ascending rather than descending.
     - added next_trip() iterator in Velib.pm

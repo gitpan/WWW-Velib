@@ -23,6 +23,9 @@ eval q{ use_ok 'WWW::Velib::Station' };
 eval q{ use_ok 'WWW::Velib::Trip' };
 
 diag( "testing WWW::Velib v$WWW::Velib::VERSION" );
+diag( " ...  WWW::Velib::Map v$WWW::Velib::Map::VERSION" );
+diag( " ...  WWW::Velib::Station v$WWW::Velib::Station::VERSION" );
+diag( " ...  WWW::Velib::Trip v$WWW::Velib::Trip::VERSION" );
 
 {
     my $v = WWW::Velib->new(login => '123456', pin => '9876', defer => 1);

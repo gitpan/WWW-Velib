@@ -18,3 +18,9 @@ Reduce size of eg/data/*
 Diff two maps
 
 Search stations by like_name, like_address
+
+Velib trips: return DateTime objects if DateTime is installed
+(override via a package var)?
+
+Velib trip: return average speed (need a map, to obtain geographic
+coordinates).

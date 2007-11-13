@@ -7,7 +7,7 @@ package WWW::Velib::Trip;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 sub make {
     my $class = shift;
@@ -36,8 +36,8 @@ WWW::Velib::Trip - Details of a single trip made on the Velib system
 
 =head1 VERSION
 
-This document describes version 0.02 of WWW::Velib::Trip, released
-2007-xx-xx.
+This document describes version 0.03 of WWW::Velib::Trip, released
+2007-11-13.
 
 =head1 SYNOPSIS
 
@@ -58,15 +58,32 @@ This document describes version 0.02 of WWW::Velib::Trip, released
 
 =item make
 
+Make a W::V::Trip object (usually called on your behalf from
+C<WWW::Velib>). Requires six parameters, date (in dd/mm/yyyy format,
+from station name, to station name, trip duration in hours, trip
+duration in additional minutes and cost.
+
 =item from
+
+Name of the station of departure.
 
 =item to
 
+Name of the station of arrival.
+
 =item date
+
+The date the trip took place (in dd/mm/yyyy format).
 
 =item duration
 
+The duration of the trip, in minutes. As an example, for a trip
+that took 1 hour and 26 minutes, 86 minutes will be returned.
+
 =item cost
+
+The cost of the trip. Trips that take 30 minutes or less are
+free. After that, the price goes up astronomically!
 
 =back
 

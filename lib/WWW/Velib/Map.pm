@@ -144,8 +144,8 @@ WWW::Velib::Map Process the Velib' map information
 
 =head1 VERSION
 
-This document describes version 0.01 of WWW::Velib::Map, released
-2007-xx-xx.
+This document describes version 0.02 of WWW::Velib::Map, released
+2007-11-13.
 
 =head1 SYNOPSIS
 
